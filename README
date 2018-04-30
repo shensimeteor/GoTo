@@ -1,0 +1,20 @@
+only for bash (not for csh, ksh, ...)
+a command for quick navigation to some dirs (specified in Table) and last 10 visited dirs
+
+1. config
+in ~/.bashrc
+add:
+ export DIR_GT="$HOME/script/GoTo"  #this directory
+ alias gt=". $DIR_GT/gt_root.sh"
+ . $DIR_GT/bashrc_gt
+
+2. usage
+a. mkdir sure $DIR_GT/Tables/default.tbl exist (touch it)
+b. gt  #view the dir list (from current table) and navigate
+c. gt -addwd  #add current workding dir to current Table
+d. gt -cdtable #goto $DIR_GT/Tables/, can mannually add a table
+e. gt -new x.tbl  #new table 
+f. gt -load x.tbl  #load a table (replace default.tbl)
+g. gt -reset  #i.e. gt -load default.tbl
+h. gt x.tbl  #gt, but with x.tbl (temporarily switch a table, just for this gt comamnd)
+i. gt -h #help

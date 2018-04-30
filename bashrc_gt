@@ -1,0 +1,96 @@
+#!/bin/bash
+# --------------------------------------------------------------------------
+# History:
+#   2014.7.19 : update : fix a bug when cd <dir> where <dir> contains blanks, e.g. "1\ 2"
+# --------------------------------------------------------------------------
+
+
+# dir_transport:
+#alias ..='cd ../'
+#alias ...='cd ../../'
+#alias ....='cd ../../../'
+
+## envir. vars
+test -z "$GT_TABLE_ONLOAD" &&
+export GT_TABLE_ONLOAD="$DIR_GT/Tables/default.tbl"
+
+# Added by XU to enhence cd .
+# Refer :http://aijazansari.com/2010/02/20/navigating-the-directory-stack-in-bash/
+# An enhanced 'cd' - push directories
+    # onto a stack as you navigate to it.
+    #
+    # The current directory is at the top
+    # of the stack.
+    #
+    function stack_cd {
+        if [ $# -eq 1 ]; then
+            # use the pushd bash command to push the directory
+            # to the top of the stack, and enter that directory
+            pushd "$1" &> /dev/null || echo "-bash: cd: $1: No such directory"
+        else
+            # the normal cd behavior is to enter $HOME if no
+            # arguments are specified
+            pushd $HOME > /dev/null
+        fi
+    }
+    # the cd command is now an alias to the stack_cd function
+    #
+    alias cd=stack_cd
+    # Swap the top two directories on the stack
+    #
+    function swap {
+        pushd > /dev/null
+    }
+    # s is an alias to the swap function
+    alias s=swap
+    # Pop the top (current) directory off the stack
+    # and move to the next directory
+    #
+ function pop_stack {
+        popd > /dev/null
+    }
+    alias p=pop_stack
+    # Display the stack of directories and prompt
+    # the user for an entry.
+    #
+    # If the user enters 'p', pop the stack.
+    # If the user enters a number, move that
+    # directory to the top of the stack
+    # If the user enters 'q', don't do anything.
+    #
+    function display_stack
+    {
+        dirs -v
+        echo -n "#: "
+        read dir
+        if [[ $dir = 'p' ]]; then
+            pushd > /dev/null
+        elif [[ $dir != 'q' ]]; then
+            d=$(dirs -l +$dir);
+            popd +$dir > /dev/null
+            pushd "$d" > /dev/null
+        fi
+    }
+    alias d=display_stack
+    
+
+function _gt() {
+    COMPREPLY=()
+    local cur=${COMP_WORDS[COMP_CWORD]}; #current word
+    local com=${COMP_WORDS[COMP_CWORD-1]}; ##last word
+    subcommands="-addwd -edit -new -load -reset -help -h -cdtable"
+    tables=$(/bin/ls $DIR_GT/Tables)
+    if [ "$com" == "gt"  ]; then
+        if [ -n "$(echo $cur | /bin/grep \-)" ]; then
+            COMPREPLY=($(compgen -W "$subcommands" -- $cur))
+        else
+            COMPREPLY=($(compgen -W "$tables" -- $cur))
+        fi
+    elif [ "$com" == "-load" ]; then
+        COMPREPLY=($(compgen -W "$tables" -- $cur))
+    fi
+    return 0
+}
+
+complete -F _gt gt  ##link _gt call & gt command
+##
