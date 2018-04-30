@@ -9,7 +9,7 @@ add:
  . $DIR_GT/bashrc_gt
 
 2. usage
-a. mkdir sure $DIR_GT/Tables/default.tbl exist (touch it)
+a. mkdir sure $DIR_GT/Tables/default.tbl exist (if not exist, touch it; you can clear its content, because I put mine directories in it)
 b. gt  #view the dir list (from current table) and navigate
 c. gt -addwd  #add current workding dir to current Table
 d. gt -cdtable #goto $DIR_GT/Tables/, can mannually add a table
